@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,12 +38,19 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         subject = getIntent().getExtras().getString("Subject");
         toolbarTextAppearance();
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
@@ -61,40 +69,48 @@ public class MainActivity extends AppCompatActivity {
 
     private void setToolbarHeader(String subject) {
         header = (ImageView) findViewById(R.id.imageView);
-        if(subject.equals("CHEMISTRY"))
-        {
-
+        if (subject.equals("CHEMISTRY")) {
             Glide.with(this).load(R.drawable.chemistry_head).into(header);
-        }
-        else if(subject.equals("MATHS"))
-        {
+
+        } else if (subject.equals("MATHS")) {
             Glide.with(this).load(R.drawable.maths_head).into(header);
-        }
-        else if(subject.equals("PROGRAMMING"))
-        {
+
+        } else if (subject.equals("PROGRAMMING")) {
             Glide.with(this).load(R.drawable.computer_head).into(header);
-        }
-        else if(subject.equals("PHYSICS"))
-        {
+
+        } else if (subject.equals("PHYSICS")) {
             Glide.with(this).load(R.drawable.physics_head).into(header);
-        }
-        else if (subject.equals("ELECTRICAL"))
-        {
+
+        } else if (subject.equals("ELECTRICAL")) {
             Glide.with(this).load(R.drawable.electrical_head).into(header);
-        }
-        else if (subject.equals("COMMUNICATION SKILLS"))
-        {
+
+        } else if (subject.equals("COMMUNICATION SKILLS")) {
             Glide.with(this).load(R.drawable.communication_head).into(header);
-        }
-        else if(subject.equals("ENVIRONMENTAL"))
-        {
+
+        } else if (subject.equals("ENVIRONMENTAL")) {
             Glide.with(this).load(R.drawable.environmental_head).into(header);
-        }
-        else if(subject.equals("BME"))
-        {
+
+        } else if (subject.equals("BME")) {
             Glide.with(this).load(R.drawable.mechanical_head).into(header);
+
         }
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+            {
+                this.finish();
+                return true;
+            }
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void toolbarTextAppearance() {

@@ -1,10 +1,10 @@
 package com.example.dell.dtustudies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,25 +13,42 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.id.list;
+import static com.example.dell.dtustudies.R.raw.timetable_group_a;
+import static com.example.dell.dtustudies.R.raw.timetable_group_b;
 
 public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "NavActivity";
 
     List<String> list;
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+   }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -125,17 +142,21 @@ public class NavActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.group_a) {
+            
+            openPDF(id);
+           
+        } else if (id == R.id.group_b) {
+            openPDF(id);
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.ask_a_doubt) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.developer) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.feedback) {
+            Intent feedback = new Intent(this,FeedbackActivity.class);
+            startActivity(feedback);
+        } else if (id == R.id.share) {
 
         }
 
@@ -143,4 +164,43 @@ public class NavActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void copyFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+    }
+    
+    
+    public void openPDF(int id)
+    {      
+        String name = null;
+        int table_id;
+        if(id==R.id.group_a)
+        {
+            name = "Group_A_TimeTable.pdf";
+            table_id = timetable_group_a;
+        }
+        else
+        {
+            name = "Group_B_TimeTable.pdf";
+            table_id = timetable_group_b;
+        }
+        try {
+            copyFile(getResources().openRawResource(table_id), new FileOutputStream(new File(Environment.getExternalStorageDirectory()+"/testFiles", name)));
+            Log.i(TAG, "openPDF: " + String.valueOf(table_id));
+        } catch (IOException e) {
+            Toast.makeText(NavActivity.this, "Error", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+        File pdfFile = new File(Environment.getExternalStorageDirectory()+"/testFiles/"+ name);
+        Uri path = Uri.fromFile(pdfFile);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setDataAndType(path, "application/pdf");
+        startActivity(intent);
+    }
+
 }
